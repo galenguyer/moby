@@ -30,7 +30,7 @@ func Push(ctx context.Context, ref reference.Named, config *ImagePushConfig) err
 		return err
 	}
 
-	progress.Messagef(config.ProgressOutput, "", "The push refers to repository [%s]", repoInfo.Name.Name())
+	progress.Messagef(config.ProgressOutput, "", "The push refers to repository [%s] (using modified push)", repoInfo.Name.Name())
 
 	associations := config.ReferenceStore.ReferencesByName(repoInfo.Name)
 	if len(associations) == 0 {

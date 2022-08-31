@@ -194,3 +194,33 @@ func PingV2Registry(endpoint *url.URL, transport http.RoundTripper) (challenge.M
 
 	return challengeManager, nil
 }
+
+// PostV2Registry attempts to ping a v2 registry and on success return a
+// challenge manager for the supported authentication types.
+// If a response is received but cannot be interpreted, a PingResponseError will be returned.
+// A POST request is used for registries that have a proxy that restricts pushing but not pulling
+func PostV2Registry(endpoint *url.URL, transport http.RoundTripper) (challenge.Manager, error) {
+	pingClient := &http.Client{
+		Transport: transport,
+		Timeout:   15 * time.Second,
+	}
+	endpointStr := strings.TrimRight(endpoint.String(), "/") + "/v2/"
+	req, err := http.NewRequest(http.MethodPost, endpointStr, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := pingClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	challengeManager := challenge.NewSimpleManager()
+	if err := challengeManager.AddResponse(resp); err != nil {
+		return nil, PingResponseError{
+			Err: err,
+		}
+	}
+
+	return challengeManager, nil
+}

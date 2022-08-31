@@ -84,7 +84,7 @@ func newRepository(
 	modifiers := registry.Headers(dockerversion.DockerUserAgent(ctx), metaHeaders)
 	authTransport := transport.NewTransport(base, modifiers...)
 
-	challengeManager, err := registry.PingV2Registry(endpoint.URL, authTransport)
+	challengeManager, err := registry.PostV2Registry(endpoint.URL, authTransport)
 	if err != nil {
 		transportOK := false
 		if responseErr, ok := err.(registry.PingResponseError); ok {
